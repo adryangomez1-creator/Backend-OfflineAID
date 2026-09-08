@@ -1,3 +1,1 @@
-/*
-XDXDDXD
-*/
+export * from './Usuario.js';
