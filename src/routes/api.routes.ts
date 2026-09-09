@@ -1,8 +1,26 @@
 import { Router, type Router as ExpressRouter } from 'express';
 import { crearCrud } from '../controllers/crud.controller.js';
+import syncRoutes from './sync.routes.js';
+import emergenciasRoutes from './emergencias.routes.js';
+import asignacionesRoutes from './asignaciones.routes.js';
+import notificacionesRoutes from './notificaciones.routes.js';
+import estadisticasRoutes from './estadisticas.routes.js';
 
 const router: ExpressRouter = Router();
 
+// =========================================================================
+// FASE 3: MÉTODOS ESPECIALES DE NEGOCIO (OfflineAid)
+// (Se registran antes de los CRUDs genéricos para evitar colisión de rutas con :id)
+// =========================================================================
+router.use(syncRoutes);
+router.use(emergenciasRoutes);
+router.use(asignacionesRoutes);
+router.use(notificacionesRoutes);
+router.use(estadisticasRoutes);
+
+// =========================================================================
+// FASE 2: CRUDS BÁSICOS POR ENTIDAD
+// =========================================================================
 function registrarCrud(ruta: string, tabla: string, id: string, columnas: string[]) {
   const crud = crearCrud(tabla, id, columnas);
   router.get(ruta, crud.obtenerTodos);

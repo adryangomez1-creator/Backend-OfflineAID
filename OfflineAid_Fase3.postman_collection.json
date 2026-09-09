@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "offlineaid-fase3-collection",
+		"name": "OfflineAid - Fase 3 Métodos Especiales",
+		"description": "Colección completa para probar todos los métodos especiales de la Fase 3 de OfflineAid.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Sincronización Offline",
+			"item": [
+				{
+					"name": "1.1 Descargar datos offline (Precarga local)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/sync/datos-offline?id_usuario=3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "sync", "datos-offline"],
+							"query": [
+								{ "key": "id_usuario", "value": "3" }
+							]
+						}
+					}
+				},
+				{
+					"name": "1.2 Sincronización por lote (Batch Sync con temp_id)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id_usuario\": 3,\n  \"operaciones\": [\n    {\n      \"temp_id\": \"temp-emergencia-001\",\n      \"tipo_operacion\": \"CREAR_EMERGENCIA\",\n      \"payload\": {\n        \"id_tipo\": 1,\n        \"titulo\": \"Accidente vehicular en zona rural sin red\",\n        \"descripcion\": \"Colisión frontal en tramo montañoso sin señal de telefonía.\",\n        \"latitud\": 14.6500,\n        \"longitud\": -90.5200,\n        \"direccion\": \"Km 42 Carretera a San Juan Sacatepéquez\"\n      }\n    },\n    {\n      \"temp_id\": \"temp-foto-002\",\n      \"tipo_operacion\": \"SUBIR_EVIDENCIA\",\n      \"payload\": {\n        \"id_emergencia\": \"temp-emergencia-001\",\n        \"url_imagen\": \"https://offlineaid.test/fotos/choque_offline.jpg\"\n      }\n    },\n    {\n      \"temp_id\": \"temp-gps-003\",\n      \"tipo_operacion\": \"ACTUALIZAR_UBICACION\",\n      \"payload\": {\n        \"id_emergencia\": \"temp-emergencia-001\",\n        \"latitud\": 14.6520,\n        \"longitud\": -90.5215,\n        \"direccion\": \"Km 42.3 Carretera a San Juan\"\n      }\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/sync/batch",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "sync", "batch"]
+						}
+					}
+				},
+				{
+					"name": "1.3 Ver cola offline pendiente o con error",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/cola-offline/pendientes",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "cola-offline", "pendientes"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Emergencias y Ubicación",
+			"item": [
+				{
+					"name": "2.1 Reportar emergencia integral con evidencias",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id_usuario\": 3,\n  \"id_tipo\": 2,\n  \"titulo\": \"Derrumbe bloquea carretera principal\",\n  \"descripcion\": \"Lodo y rocas cayeron obstruyendo ambos carriles.\",\n  \"latitud\": 14.6350,\n  \"longitud\": -90.5150,\n  \"direccion\": \"Sector El Mirador, Aldea Las Trojes\",\n  \"evidencias\": [\n    \"https://offlineaid.test/fotos/derrumbe1.jpg\",\n    \"https://offlineaid.test/fotos/derrumbe2.jpg\"\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/reportar",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "reportar"]
+						}
+					}
+				},
+				{
+					"name": "2.2 Actualizar ubicación de emergencia en tiempo real",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latitud\": 14.6380,\n  \"longitud\": -90.5170,\n  \"direccion\": \"Refugio comunal temporal Los Sauces\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/1/ubicacion",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "1", "ubicacion"]
+						}
+					}
+				},
+				{
+					"name": "2.3 Cambiar estado de la emergencia",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"EN_PROCESO\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/1/estado",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "1", "estado"]
+						}
+					}
+				},
+				{
+					"name": "2.4 Listar emergencias activas (priorizadas)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/activas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "activas"]
+						}
+					}
+				},
+				{
+					"name": "2.5 Búsqueda de emergencias cercanas (Radio en KM)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/cercanas?latitud=14.64&longitud=-90.51&radio_km=20",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "cercanas"],
+							"query": [
+								{ "key": "latitud", "value": "14.64" },
+								{ "key": "longitud", "value": "-90.51" },
+								{ "key": "radio_km", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "2.6 Ver detalle 360° de la emergencia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/detalle/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "detalle", "1"]
+						}
+					}
+				},
+				{
+					"name": "2.7 Ver historial de emergencias de un usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/usuario/3",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "usuario", "3"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Despacho y Asignaciones",
+			"item": [
+				{
+					"name": "3.1 Despachar institución a emergencia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id_institucion\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/emergencias/1/asignar",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "emergencias", "1", "asignar"]
+						}
+					}
+				},
+				{
+					"name": "3.2 Actualizar estado de asignación (Finalizar)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"FINALIZADA\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/asignaciones/1/estado",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "asignaciones", "1", "estado"]
+						}
+					}
+				},
+				{
+					"name": "3.3 Emergencias asignadas a una institución",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/instituciones/1/emergencias",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "instituciones", "1", "emergencias"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Notificaciones y Alertas",
+			"item": [
+				{
+					"name": "4.1 Emitir alerta masiva comunitaria",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Alerta Roja: Lluvias torrenciales y riesgo de deslaves\",\n  \"mensaje\": \"Se recomienda a las comunidades rurales permanecer en zonas altas.\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/notificaciones/alerta-comunitaria",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "notificaciones", "alerta-comunitaria"]
+						}
+					}
+				},
+				{
+					"name": "4.2 Ver notificaciones no leídas de un usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/notificaciones/usuario/3/no-leidas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "notificaciones", "usuario", "3", "no-leidas"]
+						}
+					}
+				},
+				{
+					"name": "4.3 Marcar notificación como leída",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/notificaciones/1/leida",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "notificaciones", "1", "leida"]
+						}
+					}
+				},
+				{
+					"name": "4.4 Marcar todas las notificaciones como leídas",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/notificaciones/usuario/3/leer-todas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "notificaciones", "usuario", "3", "leer-todas"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Dashboard y Estadísticas",
+			"item": [
+				{
+					"name": "5.1 Métricas de impacto y efectividad offline",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/estadisticas/dashboard",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "estadisticas", "dashboard"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
